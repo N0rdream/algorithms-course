@@ -1,0 +1,87 @@
+<input> 10 5 -6 2 -1 4 3 0 7 -5 7
+
+; r[0] - work
+; r[1] - количество чисел
+; r[2] - индекс первого числа (7)
+; r[3] - для итерации по индексам
+; r[4] - tmp для перестановки
+; r[5] - индекс первого числа из пары сравнения
+; r[6] - индекс второго числа из пары сравнения
+; r[7] - первое число
+
+
+read 1
+load =7
+store 2
+load 1
+store 3
+
+loop_store:
+    load 2
+    add 1
+    sub 3
+    read *0
+    load 3
+    sub =1
+    store 3
+    jgtz loop_store
+
+load 1
+store 3
+
+loop_outer:
+    load 2
+    add 1
+    sub 3
+    store 5
+    store 6
+    load 1
+    add 2
+    sub =1
+    sub 5
+    jz loop_output
+
+    loop_inner:
+        load 6
+        add =1
+        store 6
+        load *5
+        sub *6
+        jgtz permutation
+
+        back_to_loop_inner:
+            load 1
+            add 2
+            sub =1
+            sub 6
+            jgtz loop_inner
+    
+    load 3
+    sub =1
+    store 3
+    jgtz loop_outer
+
+loop_output:
+    load 1
+    store 3
+
+    loop_write:       
+       load 2
+       add 1
+       sub 3
+       write *0
+       load 3
+       sub =1
+       store 3
+       jgtz loop_write
+     
+    halt
+
+permutation:
+    load *5
+    store 4
+    load *6
+    store *5
+    load 4
+    store *6
+    jmp back_to_loop_inner

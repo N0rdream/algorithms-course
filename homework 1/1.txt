@@ -1,0 +1,38 @@
+<input> 4 1
+
+; r[0] - work
+; r[1] - первое число / количество итераций
+; r[2] - второе число / прибавка
+; r[3] - результат
+; r[4] - tmp
+
+read 1
+read 2
+load 2
+sub 1
+
+jgtz main
+
+load 1
+store 4
+load 2
+store 1
+load 4
+store 2
+
+main:
+    load =0
+    store 3
+
+    loop:
+        load 3
+        add 2
+        store 3
+        load 1
+        sub =1
+        store 1
+
+    jgtz loop
+    write 3
+    halt
+

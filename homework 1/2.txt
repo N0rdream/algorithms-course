@@ -1,0 +1,29 @@
+<input> 8 30
+
+; r[0] - work
+; r[1] - первое число / остаток
+; r[2] - второе число
+; r[3] - частное
+
+read 1
+read 2
+load =0
+store 3
+
+mark_1:
+    load 1
+    sub 2
+
+jgtz mark_2
+jz mark_2
+
+write 3
+write 1
+halt
+
+mark_2:
+    store 1
+    load 3
+    add =1
+    store 3
+    jmp mark_1
