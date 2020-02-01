@@ -3,7 +3,8 @@ import random
 
 class NodeBinary:
     
-    def __init__(self, value):
+    def __init__(self, key, value):
+        self.key = key
         self.value = value
         self.parent = None
         self.l_child = None
@@ -28,8 +29,8 @@ class NodeBinary:
         return self.r_child is not None
         
     def insert_node(self, node):
-        # если значение в текущем узле не больше чем значение в добавляемом узле
-        if self.value < node.value:
+        # если ключ текущего узла меньше чем ключ добавляемого узла
+        if self.key < node.key:
             # если у текущего узла есть правый потомок
             if self.has_r_child():
                 # добавляем узел в поддерево, где корень - правый потомок текущего узла
@@ -40,8 +41,8 @@ class NodeBinary:
                 self.r_child = node
                 # задаем у правого потомка ссылку на родителя, которым является текущий узел
                 self.r_child.parent = self
-        # если значение в текущем узле больше чем добавляемое значение
-        if self.value > node.value:
+        # если ключ текущего узла больше чем ключ добавляемого узла
+        if self.key > node.key:
             # если у текущего узла есть левый потомок
             if self.has_l_child():
                 # добавляем узел в поддерево, где корень - левый потомок текущего узла
@@ -53,13 +54,13 @@ class NodeBinary:
                 # задаем у левого потомка ссылку на родителя, которым является текущий узел
                 self.l_child.parent = self
                 
-    def get_node(self, value):
-        if self.value == value:
+    def get_node(self, key):
+        if self.key == key:
             return self
-        elif self.value < value and self.has_r_child():
-            return self.r_child.get_node(value)
-        elif self.value > value and self.has_l_child():
-            return self.l_child.get_node(value)
+        elif self.key < key and self.has_r_child():
+            return self.r_child.get_node(key)
+        elif self.key > key and self.has_l_child():
+            return self.l_child.get_node(key)
         
     def remove_node(self):
         # если удаляемый узел является левым потомком своего родителя
@@ -81,12 +82,21 @@ class NodeBinary:
         
     def __iter__(self):
         if self.has_l_child():
-            for value in self.l_child:
-                yield value
-        yield self.value
+            for k, v in self.l_child:
+                yield k, v
+        yield self.key, self.value
         if self.has_r_child():
-            for value in self.r_child:
-                yield value
+            for k, v in self.r_child:
+                yield k, v
+
+    # def __len__(self):
+    #     if not self.has_l_child() and not self.has_r_child():
+    #         return 1
+    #     if self.has_l_child() and not self.has_r_child():
+    #         return 1 + len(self.l_child)
+    #     if not self.has_l_child() and self.has_r_child():
+    #         return 1 + len(self.r_child)
+    #     return 1 + len(self.l_child) + len(self.r_child)
                 
     def rotate(self):
         #
@@ -143,8 +153,8 @@ class NodeBinary:
         if self.parent is None:
             p = 'None'
         else:
-            p = self.parent.value
-        label = '(' + str(self.value) + '->' + str(p) + ')'
+            p = self.parent.key
+        label = '(' + str(self.key) + '->' + str(p) + ')'
         if self.l_child is None:
             left_lines, left_pos, left_width = [], 0, 0
         else:
@@ -179,8 +189,8 @@ class NodeBinary:
 
 class NodeAVL(NodeBinary):
     
-    def __init__(self, value):
-        super().__init__(value)
+    def __init__(self, key, value):
+        super().__init__(key, value)
         self.height = 0
         
     def update_height(self):
@@ -218,13 +228,13 @@ class NodeRandom(NodeAVL):
             node_parent = node_parent.parent
             
     def insert_root(self, node):
-        if self.value < node.value:
+        if self.key < node.key:
             if self.has_r_child():
                 self.r_child.insert_root(node)
             else:
                 self.r_child = node
                 self.r_child.parent = self
-        elif self.value > node.value:
+        elif self.key > node.key:
             if self.has_l_child():
                 self.l_child.insert_root(node)
             else:
@@ -243,13 +253,13 @@ class NodeRandom(NodeAVL):
             self.insert_root(node)
             node.update_heights()
             return
-        if self.value < node.value:
+        if self.key < node.key:
             if self.has_r_child():
                 self.r_child.insert_node(node)
             else:
                 self.r_child = node
                 self.r_child.parent = self
-        if self.value > node.value:
+        if self.key > node.key:
             if self.has_l_child():
                 self.l_child.insert_node(node)
             else:
@@ -375,26 +385,36 @@ class TreeBinary:
     def __init__(self):
         self.root = None
         self.node_type = NodeBinary
+
+    def is_empty(self):
+        return self.root is None
         
-    def insert(self, value):
-        node = self.node_type(value)
+    def insert(self, key, value):
+        node = self.node_type(key, value)
         if self.root is None:
             self.root = node
         else:
             self.root.insert_node(node)
         return node
         
-    def has_value(self, value):
+    def has_key(self, key):
         if self.root is not None:
-            node = self.root.get_node(value)
+            node = self.root.get_node(key)
             if node is not None:
                 return True
         return False
+
+    def get_value(self, key):
+        if self.root is not None:
+            node = self.root.get_node(key)
+            if node is not None:
+                return node.value
+        raise KeyError
     
-    def remove(self, value):
+    def remove(self, key):
         if self.root is None:
             raise KeyError
-        node = self.root.get_node(value)
+        node = self.root.get_node(key)
         if node is None:
             raise KeyError
         if node.parent is not None:
@@ -429,6 +449,12 @@ class TreeBinary:
         else:
             return []
 
+    # def __len__(self):
+    #     if self.root is not None:
+    #         return len(self.root)
+    #     else:
+    #         return 0
+
 
 class TreeAVL(TreeBinary):
     
@@ -436,12 +462,12 @@ class TreeAVL(TreeBinary):
         super().__init__()
         self.node_type = NodeAVL
     
-    def insert(self, value):
-        node = super().insert(value)
+    def insert(self, key, value):
+        node = super().insert(key, value)
         self.balance(node)
         
-    def remove(self, value):
-        node = super().remove(value)
+    def remove(self, key):
+        node = super().remove(key)
         self.balance(node)
         
     def balance(self, node):
@@ -477,16 +503,16 @@ class TreeRandom(TreeBinary):
         super().__init__()
         self.node_type = NodeRandom
         
-    def insert(self, value):
-        node = super().insert(value)
+    def insert(self, key, value):
+        node = super().insert(key, value)
         if node.parent is None:
             self.root = node
     
-    def remove(self, value):
+    def remove(self, key):
         if self.root is None:
             raise KeyError
         # узел для удаления
-        node = self.root.get_node(value)
+        node = self.root.get_node(key)
         if node is None:
             raise KeyError
         # делаем слияние левого и  правого поддеревьев
@@ -516,20 +542,30 @@ class TreeSplay(TreeBinary):
         super().__init__()
         self.node_type = NodeSplay 
     
-    def has_value(self, value):
+    def has_key(self, key):
         if self.root is None:
             return False
-        node = self.root.get_node(value)
+        node = self.root.get_node(key)
         if node is None:
             return False
         node.splay()
         self.root = node
         return True
-   
-    def remove(self, value):
+
+    def get_value(self, key):
         if self.root is None:
             raise KeyError
-        node = self.root.get_node(value)
+        node = self.root.get_node(key)
+        if node is None:
+            raise KeyError
+        node.splay()
+        self.root = node
+        return node.value
+   
+    def remove(self, key):
+        if self.root is None:
+            raise KeyError
+        node = self.root.get_node(key)
         if node is None:
             raise KeyError
         node.splay()
